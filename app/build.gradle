@@ -1,0 +1,41 @@
+plugins {
+    id 'application'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation libs.guava
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.seleniumhq.selenium:selenium-java'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework:spring-messaging'
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.springframework:spring-webflux'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'javax.websocket:javax.websocket-api'
+    implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClass = 'test.server.App'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

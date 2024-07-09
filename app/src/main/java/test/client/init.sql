@@ -1,0 +1,5 @@
+CREATE TABLE main(
+    T DATETIME,
+    X INTEGER,
+    Y INTEGER
+);
