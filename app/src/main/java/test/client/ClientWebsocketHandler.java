@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class ClientWebsocketHandler {
-
     private WebSocketContainer container;
     private MessageEndpoint endpoint;
 
@@ -26,5 +25,4 @@ public class ClientWebsocketHandler {
     public void sendMessage(String message) throws IOException {
         this.endpoint.sendMessage(message);
     }
-
 }

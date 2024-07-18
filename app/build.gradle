@@ -14,7 +14,6 @@ dependencies {
     implementation libs.guava
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.seleniumhq.selenium:selenium-java'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework:spring-messaging'
@@ -22,8 +21,8 @@ dependencies {
     implementation 'org.springframework:spring-webflux'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'javax.websocket:javax.websocket-api'
-    implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client'
+    implementation 'jakarta.websocket:jakarta.websocket-api'
+    implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client:1.17'
 }
 
 java {

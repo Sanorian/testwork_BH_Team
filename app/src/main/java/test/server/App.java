@@ -1,10 +1,5 @@
 package test.server;
 
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,39 +11,20 @@ import static java.lang.Math.min;
 import static java.lang.Thread.sleep;
 
 public class App {
-    private ArrayList<WebDriver> drivers = new ArrayList<>();
-    private Process process;
-    private Integer width, height;
-    private Integer radius;
+    private ArrayList<Process> browserProcessList = new ArrayList<>();
+    private Process cursorProcess;
 
     public App() {
-        java.awt.Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Integer browserWindowWidth = (int) (floor((double) screenSize.width / 2));
-        Integer browserWindowHeight = (int) (floor((double) screenSize.height / 2));
-        width = browserWindowWidth;
-        height = browserWindowHeight;
-        radius = min(width/4, height/4);
-        runBrowser(0, 0, browserWindowWidth, browserWindowHeight);
-        runBrowser(browserWindowWidth, 0, browserWindowWidth, browserWindowHeight);
-        runBrowser(0, browserWindowHeight, browserWindowWidth, browserWindowHeight);
+        runBrowsers(3);
         runCursors();
     }
 
-    private void runBrowser(Integer x, Integer y, Integer width, Integer height){
-        WebDriver driver = new FirefoxDriver();
-        Dimension windowSize = new Dimension(width, height);
-        driver.manage().window().setSize(windowSize);
-        Point windowPosition = new Point(x, y);
-        driver.manage().window().setPosition(windowPosition);
-        this.drivers.add(driver);
-    }
-
     private void runCursors(){
-        String command = "./create_pointer"; // замените на путь к вашей программе
+        String command = "./create_pointer";
         try {
-            this.process = Runtime.getRuntime().exec(command);
-            this.process.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(this.process.getInputStream()));
+            this.cursorProcess = Runtime.getRuntime().exec(command);
+            this.cursorProcess.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(this.cursorProcess.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
@@ -60,15 +36,71 @@ public class App {
     }
 
     public void closeAll(){
-        this.drivers.forEach(WebDriver::quit);
-        this.process.destroy();
+        // wmctrl -i pid -c pid - убивание окна по pid
+        for (Process process : browserProcessList){
+            process.destroy();
+        }
+        cursorProcess.destroy();
     }
 
-    public Integer[] getCoordinates(Double period, Double angle) throws InterruptedException {
-        Double radians = 1/period * Math.PI / 180.0;
-        Double x =  width/4 + radius * Math.cos(radians);
-        Double y = height/4 + radius * Math.sin(radians);
-        sleep((long) floor(period*1000));
-        return new Integer[]{(int) floor(x), (int) floor(y)};
+    public Integer[] getCoordinates() throws InterruptedException {
+        // написать расчет координат. Или даже получение
+        return new Integer[]{};
+    }
+
+    private void runBrowsers(Integer numberOfWindows){
+        for (int i=0; i<numberOfWindows; i++){
+            runBrowser();
+        }
+        resizeAndMoveBrowsers(numberOfWindows);
+    }
+
+    private void runBrowser(){
+        try {
+            Process browser = Runtime.getRuntime().exec("firefox");
+            browser.waitFor();
+            this.browserProcessList.add(browser);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    private void resizeAndMoveBrowsers(Integer numberOfWindows){
+        ArrayList<String> browsersIdList = new ArrayList<>();
+        try {
+            Process windowsList = Runtime.getRuntime().exec("wmctrl -l");
+            windowsList.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(windowsList.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("Firefox")){
+                    browsersIdList.add(line.substring(0, 9));
+                }
+            }
+            reader.close();
+            Integer x0 = 0, y0 = 0;
+            java.awt.Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            Integer widthOfBrowserWindow = (int) floor(2*screenSize.getWidth()/(numberOfWindows + numberOfWindows%2));
+            Integer heightOfBrowserWindow = (int) floor(screenSize.getHeight()/2);
+            for (String pid: browsersIdList){
+                resizeAndMoveBrowser(pid, 0, 0, widthOfBrowserWindow, heightOfBrowserWindow);
+                if (x0+widthOfBrowserWindow>screenSize.getWidth()){
+                    x0 = 0;
+                    y0 += heightOfBrowserWindow;
+                } else {
+                    x0 += widthOfBrowserWindow;
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void resizeAndMoveBrowser(String pid, Integer x0, Integer y0, Integer windowWidth, Integer windowHeight){
+        try {
+            Process resizeMovingProcess = Runtime.getRuntime().exec("wmctrl -i "+pid+" -e 0, "+x0+", "+y0+", "+windowWidth+", "+windowHeight);
+            resizeMovingProcess.waitFor();
+        } catch (IOException|InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
