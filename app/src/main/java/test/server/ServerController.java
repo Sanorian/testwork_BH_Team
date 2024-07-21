@@ -54,7 +54,7 @@ public class ServerController {
     public Message mainProcess(String message) throws Exception {
         switch (message){
             case "start"-> {
-                this.app = new App();
+                this.app = new App(3);
                 sleep(5000);
                 return new Message(getCursorCoordinates());
             }
@@ -69,7 +69,7 @@ public class ServerController {
     }
 
     private Integer[] getCursorCoordinates() throws InterruptedException {
-        Integer[] results = app.getCoordinates(this.period, this.angle);
+        Integer[] results = app.getCoordinates();
         angle += period;
         return results;
     }

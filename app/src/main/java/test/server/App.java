@@ -14,13 +14,13 @@ public class App {
     private ArrayList<Process> browserProcessList = new ArrayList<>();
     private Process cursorProcess;
 
-    public App() {
-        runBrowsers(3);
-        runCursors();
+    public App(Integer numberOfWindows) {
+        runBrowsers(numberOfWindows);
+        runCursors(numberOfWindows);
     }
 
-    private void runCursors(){
-        String command = "./create_pointer";
+    private void runCursors(Integer numberOfCursors){
+        String command = "./create_pointer "+numberOfCursors.toString();
         try {
             this.cursorProcess = Runtime.getRuntime().exec(command);
             this.cursorProcess.waitFor();
