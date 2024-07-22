@@ -40,6 +40,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.IOException;
+
 import static java.lang.Thread.sleep;
 
 @Controller
@@ -68,7 +70,7 @@ public class ServerController {
         return null;
     }
 
-    private Integer[] getCursorCoordinates() throws InterruptedException {
+    private Integer[] getCursorCoordinates() throws InterruptedException, IOException {
         Integer[] results = app.getCoordinates();
         angle += period;
         return results;

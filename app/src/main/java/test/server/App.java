@@ -3,8 +3,16 @@ package test.server;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -35,17 +43,47 @@ public class App {
         }
     }
 
-    public void closeAll(){
-        // wmctrl -i pid -c pid - убивание окна по pid
+    public void closeAll() throws MalformedURLException {
         for (Process process : browserProcessList){
             process.destroy();
+        }
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        URL url = new URL("http://localhost:18080/close");
+        Runnable task = () -> {
+            try {
+                InputStream in = url.openStream();
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        executor.submit(task);
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         cursorProcess.destroy();
     }
 
-    public Integer[] getCoordinates() throws InterruptedException {
-        // написать расчет координат. Или даже получение
-        return new Integer[]{};
+    public Integer[] getCoordinates() throws InterruptedException, IOException {;
+        URL obj = new URL("http://localhost:18080/");
+        HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+        connection.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        String serverResponse = response.toString();
+        String[] stringCoordinates = serverResponse.split(" ");
+        return new Integer[]{Integer.valueOf(stringCoordinates[0]), Integer.valueOf(stringCoordinates[1])};
     }
 
     private void runBrowsers(Integer numberOfWindows){

@@ -105,6 +105,9 @@ int main(int argc, char** argv) {
         angle += period;
         return;
     });
-
+    CROW_ROUTE(app, "/close")
+    ([&display](crow::request& req, crow::response& res){
+        XCloseDisplay(display);
+    });
     app.port(18080).multithreaded().run();
 }
