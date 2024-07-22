@@ -21,14 +21,16 @@ import static java.lang.Thread.sleep;
 public class App {
     private ArrayList<Process> browserProcessList = new ArrayList<>();
     private Process cursorProcess;
+    private Integer x;
 
-    public App(Integer numberOfWindows) {
+    public App(Integer numberOfWindows, Integer x) {
+        this.x = x;
         runBrowsers(numberOfWindows);
         runCursors(numberOfWindows);
     }
 
     private void runCursors(Integer numberOfCursors){
-        String command = "./create_pointer "+numberOfCursors.toString();
+        String command = "./create_pointer "+numberOfCursors.toString()+" "+x.toString();
         try {
             this.cursorProcess = Runtime.getRuntime().exec(command);
             this.cursorProcess.waitFor();

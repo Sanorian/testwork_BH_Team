@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
 
+import static java.lang.Math.floor;
 import static java.lang.Thread.sleep;
 
 @Controller
@@ -56,7 +57,7 @@ public class ServerController {
     public Message mainProcess(String message) throws Exception {
         switch (message){
             case "start"-> {
-                this.app = new App(3);
+                this.app = new App(3, Integer.valueOf(String.valueOf(this.x)));
                 sleep(5000);
                 return new Message(getCursorCoordinates());
             }
@@ -64,6 +65,7 @@ public class ServerController {
                 this.app.closeAll();
             }
             case "Got"->{
+                sleep((long) floor(period));
                 return new Message(getCursorCoordinates());
             }
         }
