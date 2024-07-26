@@ -35,6 +35,7 @@ __
 Результат отправлять ссылкой на git
  */
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -46,6 +47,7 @@ import static java.lang.Math.floor;
 import static java.lang.Thread.sleep;
 
 @Controller
+@EnableAutoConfiguration
 public class ServerController {
     private App app;
     Double x = 8.0;
